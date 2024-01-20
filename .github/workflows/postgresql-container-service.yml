@@ -1,5 +1,5 @@
 name: PostgreSQL container service example
-on: push
+on: workflow_dispatch
 
 env:
   WORKING_DIRECTORY: postgresql-container-service
