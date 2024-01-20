@@ -1,0 +1,48 @@
+name: PostgreSQL container service example
+on: push
+
+env:
+  WORKING_DIRECTORY: postgresql-service
+  POSTGRES_HOST: postgres
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_DB: postgres
+  POSTGRES_PORT: 5432
+
+jobs:
+  postgresql-container-service:
+    name: Create and populate a PostgreSQL database for testing purposes
+    runs-on: ubuntu-latest
+    container: node:21-slim
+    services:
+      postgres:
+          image: postgres:latest
+          env:
+            POSTGRES_USER: ${{ env.POSTGRES_USER }}
+            POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+            POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          ports:
+            - 5432:5432
+          options: >-
+            --health-cmd pg_isready 
+            --health-interval 10s 
+            --health-timeout 5s 
+            --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+      - name: Connect to PostgreSQL and populate database
+        run: node populate.js
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+      - name: Install PostgreSQL client
+        run: apt-get update && apt-get install -y postgresql-client
+
+      - name: Select and print users data
+        run: PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -c "SELECT * FROM users;"
