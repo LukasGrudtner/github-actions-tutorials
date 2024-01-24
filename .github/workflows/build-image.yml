@@ -1,0 +1,17 @@
+name: Build Docker image using a reusable workflow
+on:
+  push:
+
+jobs:
+  build:
+    name: Build Docker image
+    uses: ./.github/workflows/reusable-build-image.yml
+    with:
+      image-name: my-image
+      image-tag: latest
+      dockerfile-path: .
+      context-path: .
+      environment: Development
+
+    secrets:
+      ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
