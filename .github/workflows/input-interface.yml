@@ -1,0 +1,37 @@
+name: Workflow with input interface
+on:
+  workflow_dispatch:
+    inputs:
+      log-level:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+          - info
+          - warning
+          - debug
+      print-tags:
+        description: 'True to print to STDOUT'
+        required: true
+        type: boolean
+      tags:
+        description: 'Test scenario tags'
+        required: true
+        type: string
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
+      instances:
+        description: 'Number of instances to run tests against'
+        type: number
+        required: true
+
+jobs:
+  print-tag:
+    runs-on: ubuntu-latest
+    if:  ${{ inputs.print-tags }}
+    steps:
+      - name: Print the input tag to STDOUT
+        run: echo  The tags are ${{ inputs.tags }}
